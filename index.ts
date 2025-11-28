@@ -185,3 +185,4 @@ formatDisplay();
 // Log LWK version on startup
 console.log("LWK WASM module loaded successfully");
 
+console.log(lwk.Network.mainnet());
