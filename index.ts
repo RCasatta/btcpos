@@ -1,7 +1,10 @@
 import * as lwk from "lwk_wasm"
 import {
-    setWollet, setCurrencyCode, getCurrencyCode,
+    setWollet, getWollet,
+    setCurrencyCode, getCurrencyCode,
     setPricesFetcher, getPricesFetcher,
+    setEsploraClient, getEsploraClient,
+    setBoltzSession, getBoltzSession,
     setExchangeRate, getExchangeRate,
     setWasmReady, isWasmReady,
     subscribe
@@ -14,6 +17,11 @@ const LOCALSTORAGE_FORM_KEY: string = 'btcpos_setup_form';
 
 // Network configuration (hardcoded to mainnet)
 const network: lwk.Network = lwk.Network.mainnet();
+
+// Esplora/Waterfalls configuration
+const MAINNET_WATERFALLS_URL = "https://waterfalls.liquidwebwallet.org/liquid/api";
+const TESTNET_WATERFALLS_URL = "https://waterfalls.liquidwebwallet.org/liquidtestnet/api";
+const WATERFALLS_RECIPIENT_KEY = "age1xxzrgrfjm3yrwh3u6a7exgrldked0pdauvr3mx870wl6xzrwm5ps8s2h0p";
 
 // Reference to main app container
 const app: HTMLElement = document.getElementById('app')!;
@@ -167,6 +175,57 @@ function fiatToSatoshis(fiatAmount: number): number {
 
     const btcAmount = fiatAmount / rate;
     return Math.round(btcAmount * SATOSHIS_PER_BTC);
+}
+
+// =============================================================================
+// Esplora Client with Waterfalls
+// =============================================================================
+
+async function createEsploraClient(): Promise<lwk.EsploraClient> {
+    const url = network.isMainnet() ? MAINNET_WATERFALLS_URL : TESTNET_WATERFALLS_URL;
+    const waterfalls = true;
+    const concurrency = 4;
+    const utxoOnly = false;
+
+    const client = new lwk.EsploraClient(network, url, waterfalls, concurrency, utxoOnly);
+
+    // Set the waterfalls server recipient key for encryption
+    if (waterfalls && (network.isMainnet() || network.isTestnet())) {
+        await client.setWaterfallsServerRecipient(WATERFALLS_RECIPIENT_KEY);
+    }
+
+    return client;
+}
+
+// =============================================================================
+// Boltz Session
+// =============================================================================
+
+async function createBoltzSession(wollet: lwk.Wollet, esploraClient: lwk.EsploraClient): Promise<lwk.BoltzSession> {
+    const dwid = wollet.dwid();
+    const mnemonicKey = `btcpos-mnemonic-${dwid}`;
+
+    // Check if mnemonic exists in localStorage
+    let mnemonic: lwk.Mnemonic;
+    const storedMnemonic = localStorage.getItem(mnemonicKey);
+
+    if (storedMnemonic) {
+        // Load existing mnemonic
+        mnemonic = new lwk.Mnemonic(storedMnemonic);
+        console.log(`Found Boltz mnemonic in localStorage at key ${mnemonicKey}`);
+    } else {
+        // Create new random mnemonic and save it
+        console.log(`No mnemonic found in localStorage at key ${mnemonicKey}, creating new random mnemonic`);
+        mnemonic = lwk.Mnemonic.fromRandom(12);
+        localStorage.setItem(mnemonicKey, mnemonic.toString());
+    }
+
+    let boltzSessionBuilder = new lwk.BoltzSessionBuilder(network, esploraClient);
+    boltzSessionBuilder = boltzSessionBuilder.mnemonic(mnemonic);
+    boltzSessionBuilder = boltzSessionBuilder.referralId("btcpos");
+
+    const session = await boltzSessionBuilder.build();
+    return session;
 }
 
 // =============================================================================
@@ -590,9 +649,26 @@ function initPosPage(config: POSConfig): void {
         }
     });
 
-    // Initialize async parts (wallet and exchange rate)
+    // Update status text helper
+    function updateStatusText(text: string): void {
+        const statusText = wasmStatus.querySelector('.status-text') as HTMLElement;
+        if (statusText) {
+            statusText.textContent = text;
+        }
+    }
+
+    // Initialize async parts (wallet, esplora client, boltz session, exchange rate)
     async function initWalletAsync(): Promise<void> {
         try {
+            updateStatusText('Creating Esplora client...');
+
+            // Create Esplora client with waterfalls
+            const esploraClient = await createEsploraClient();
+            setEsploraClient(esploraClient);
+            console.log('Esplora client created with waterfalls');
+
+            updateStatusText('Initializing wallet...');
+
             // Create wallet descriptor and wallet
             const wolletDescriptor = new lwk.WolletDescriptor(config.d);
             const wollet = new lwk.Wollet(network, wolletDescriptor);
@@ -601,6 +677,14 @@ function initPosPage(config: POSConfig): void {
             // Show full wallet ID at bottom
             const dwid = wollet.dwid();
             walletIdDisplay.textContent = dwid;
+            console.log(`Wallet initialized with DWID: ${dwid}`);
+
+            updateStatusText('Creating Boltz session...');
+
+            // Create Boltz session for lightning swaps
+            const boltzSession = await createBoltzSession(wollet, esploraClient);
+            setBoltzSession(boltzSession);
+            console.log('Boltz session created');
 
             // Initialize currency and price fetcher
             const currencyCode = new lwk.CurrencyCode(currencyAlpha3);
@@ -614,6 +698,7 @@ function initPosPage(config: POSConfig): void {
 
             // Hide loading status
             wasmStatus.classList.add('hidden');
+            console.log('POS fully initialized');
         } catch (e) {
             console.error('Failed to initialize wallet:', e);
             const indicator = wasmStatus.querySelector('.status-indicator') as HTMLElement;

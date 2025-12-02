@@ -7,6 +7,7 @@ import * as lwk from "lwk_wasm"
  */
 const _state: {
     pricesFetcher: lwk.PricesFetcher | null;
+    esploraClient: lwk.EsploraClient | null;
     wollet: lwk.Wollet | null;
     currencyCode: lwk.CurrencyCode | null;
     boltzSession: lwk.BoltzSession | null;
@@ -15,6 +16,9 @@ const _state: {
 } = {
     // Prices fetcher for exchange rates
     pricesFetcher: null,
+
+    // Esplora client for blockchain data
+    esploraClient: null,
 
     // Wallet state
     wollet: null,
@@ -89,6 +93,17 @@ export function setPricesFetcher(pricesFetcher: lwk.PricesFetcher | null): lwk.P
     _state.pricesFetcher = pricesFetcher;
     publish('prices-fetcher-changed', pricesFetcher);
     return _state.pricesFetcher;
+}
+
+// EsploraClient state management
+export function getEsploraClient(): lwk.EsploraClient | null {
+    return _state.esploraClient;
+}
+
+export function setEsploraClient(esploraClient: lwk.EsploraClient | null): lwk.EsploraClient | null {
+    _state.esploraClient = esploraClient;
+    publish('esplora-client-changed', esploraClient);
+    return _state.esploraClient;
 }
 
 // Wollet state management
