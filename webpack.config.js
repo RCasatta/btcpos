@@ -31,7 +31,7 @@ module.exports = {
         extensions: ['.ts', '.js']
     },
     devServer: {
-        port: 8383,
+        port: 8384,
     },
 };
 

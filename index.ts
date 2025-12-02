@@ -57,10 +57,15 @@ function base64UrlDecode(str: string): string {
 interface POSConfig {
     d: string; // descriptor
     c: string; // currency code (alpha3)
+    g?: boolean; // show gear (optional, defaults to false)
 }
 
-function encodeConfig(descriptor: string, currency: string): string {
+function encodeConfig(descriptor: string, currency: string, showGear: boolean): string {
     const config: POSConfig = { d: descriptor, c: currency };
+    // Only include 'g' if true to keep URL shorter when false (default)
+    if (showGear) {
+        config.g = true;
+    }
     return base64UrlEncode(JSON.stringify(config));
 }
 
@@ -70,6 +75,10 @@ function decodeConfig(encoded: string): POSConfig | null {
         const config = JSON.parse(json) as POSConfig;
         if (typeof config.d !== 'string' || typeof config.c !== 'string') {
             return null;
+        }
+        // Default showGear to false if not present
+        if (typeof config.g !== 'boolean') {
+            config.g = false;
         }
         return config;
     } catch {
@@ -81,19 +90,24 @@ function decodeConfig(encoded: string): POSConfig | null {
 // LocalStorage helpers
 // =============================================================================
 
-function saveFormToLocalStorage(descriptor: string, currency: string): void {
+function saveFormToLocalStorage(descriptor: string, currency: string, showGear: boolean): void {
     try {
-        localStorage.setItem(LOCALSTORAGE_FORM_KEY, JSON.stringify({ descriptor, currency }));
+        localStorage.setItem(LOCALSTORAGE_FORM_KEY, JSON.stringify({ descriptor, currency, showGear }));
     } catch {
         // Ignore storage errors
     }
 }
 
-function loadFormFromLocalStorage(): { descriptor: string; currency: string } | null {
+function loadFormFromLocalStorage(): { descriptor: string; currency: string; showGear: boolean } | null {
     try {
         const data = localStorage.getItem(LOCALSTORAGE_FORM_KEY);
         if (data) {
-            return JSON.parse(data);
+            const parsed = JSON.parse(data);
+            // Handle old format without showGear
+            if (typeof parsed.showGear !== 'boolean') {
+                parsed.showGear = false;
+            }
+            return parsed;
         }
     } catch {
         // Ignore storage errors
@@ -238,6 +252,7 @@ function initSetupPage(): void {
     const form = document.getElementById('setup-form') as HTMLFormElement;
     const descriptorInput = document.getElementById('descriptor') as HTMLTextAreaElement;
     const currencySelect = document.getElementById('currency') as HTMLSelectElement;
+    const showGearCheckbox = document.getElementById('show-gear') as HTMLInputElement;
     const generateButton = document.getElementById('generate-link') as HTMLButtonElement;
     const messageDiv = document.getElementById('setup-message') as HTMLDivElement;
     const wasmStatus = document.getElementById('wasm-status') as HTMLDivElement;
@@ -252,6 +267,7 @@ function initSetupPage(): void {
     if (savedForm) {
         descriptorInput.value = savedForm.descriptor;
         currencySelect.value = savedForm.currency;
+        showGearCheckbox.checked = savedForm.showGear;
     }
 
     // Update WASM status
@@ -294,6 +310,7 @@ function initSetupPage(): void {
 
         const descriptor = descriptorInput.value.trim();
         const currency = currencySelect.value;
+        const showGear = showGearCheckbox.checked;
 
         if (!descriptor) {
             showMessage('Please enter a CT descriptor', true);
@@ -323,10 +340,10 @@ function initSetupPage(): void {
             }
 
             // Save form data
-            saveFormToLocalStorage(descriptor, currency);
+            saveFormToLocalStorage(descriptor, currency, showGear);
 
             // Generate the link
-            const encoded = encodeConfig(descriptor, currency);
+            const encoded = encodeConfig(descriptor, currency, showGear);
             const baseUrl = window.location.origin + window.location.pathname;
             const posLink = `${baseUrl}#${encoded}`;
 
@@ -391,6 +408,11 @@ function initPosPage(config: POSConfig): void {
     const modeSatsButton = document.getElementById('mode-sats') as HTMLButtonElement;
     const primaryDisplay = document.getElementById('primary-display') as HTMLDivElement;
     const secondaryDisplay = document.getElementById('secondary-display') as HTMLDivElement;
+
+    // Show/hide setup gear based on config
+    if (!config.g) {
+        setupLink.style.display = 'none';
+    }
 
     // Set fixed currency
     currencyCodeDisplay.textContent = currencyAlpha3;
@@ -678,8 +700,6 @@ function initPosPage(config: POSConfig): void {
             const dwid = wollet.dwid();
             walletIdDisplay.textContent = dwid;
             console.log(`Wallet initialized with DWID: ${dwid}`);
-
-            updateStatusText('Creating Boltz session...');
 
             // Create Boltz session for lightning swaps
             const boltzSession = await createBoltzSession(wollet, esploraClient);
