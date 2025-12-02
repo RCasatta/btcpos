@@ -341,7 +341,7 @@ function initSetupPage(): void {
 
             // This will throw if the descriptor is invalid
             const wolletDescriptor = new lwk.WolletDescriptor(descriptor);
-
+            const descriptorReEncoded = wolletDescriptor.toString(); // Re-encode desctiptor because aqua/green can give non-multipath longer version
             // Check if descriptor matches network
             const isMainnet = wolletDescriptor.isMainnet();
             const networkIsMainnet = network.isMainnet();
@@ -357,10 +357,10 @@ function initSetupPage(): void {
             }
 
             // Save form data
-            saveFormToLocalStorage(descriptor, currency, showGear, showDescription);
+            saveFormToLocalStorage(descriptorReEncoded, currency, showGear, showDescription);
 
             // Generate the link
-            const encoded = encodeConfig(descriptor, currency, showGear, showDescription);
+            const encoded = encodeConfig(descriptorReEncoded, currency, showGear, showDescription);
             const baseUrl = window.location.origin + window.location.pathname;
             const posLink = `${baseUrl}#${encoded}`;
 
