@@ -11,7 +11,7 @@ const descriptionInput = document.getElementById('description') as HTMLInputElem
 const submitButton = document.getElementById('submit') as HTMLButtonElement;
 
 // Exchange rates (1 BTC = 100,000,000 satoshis)
-const BTC_PRICE_USD: number = 105000; // $105,000 per BTC
+let btcPriceUsd: number = 105000; // fallback price, updated on init
 const EUR_TO_USD: number = 1.10; // 1 EUR = 1.10 USD
 const SATOSHIS_PER_BTC: number = 100000000;
 
@@ -25,7 +25,7 @@ function fiatToSatoshis(fiatAmount: number, currency: string): number {
     }
 
     // Convert USD to BTC, then to satoshis
-    const btcAmount: number = amountInUSD / BTC_PRICE_USD;
+    const btcAmount: number = amountInUSD / btcPriceUsd;
     const satoshis: number = Math.round(btcAmount * SATOSHIS_PER_BTC);
 
     return satoshis;
@@ -184,5 +184,10 @@ formatDisplay();
 
 // Log LWK version on startup
 console.log("LWK WASM module loaded successfully");
-
 console.log(lwk.Network.mainnet());
+
+
+const pricesFetcher = new lwk.PricesFetcher();
+const currency = new lwk.CurrencyCode('USD');
+const rates = await pricesFetcher.rates(currency);
+console.log("USD Median price: ", rates.median());

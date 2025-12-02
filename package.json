@@ -6,7 +6,7 @@
         "lint:fix": "eslint *.ts **/*.ts --fix"
     },
     "dependencies": {
-        "lwk_wasm": "0.11.1"
+        "lwk_wasm": "file:/home/casatta/git/lwk/lwk_wasm/pkg"
     },
     "devDependencies": {
         "@eslint/js": "^9.36.0",
