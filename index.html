@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitcoin POS</title>
     <link rel="stylesheet" href="styles.css">
+    <script defer data-domain="btcpos.cash" src="https://plausible.casatta.it/js/script.js"></script>
 </head>
 
 <body>
@@ -29,12 +30,20 @@
             <p class="subtitle">Configure your Point of Sale</p>
         </div>
 
+        <ul class="features-list">
+            <li>⚡ Receive Bitcoin Lightning payments directly to your wallet</li>
+            <li>🔗 Share the generated link with your staff — <a
+                    href="https://btcpos.cash/#eyJkIjoiY3Qoc2xpcDc3KDMyNjQxMmZmNGRmYzExMjNjNDRkM2NkNTJmMWU3MDNlNTM5NDlhNTUxNzI1MmM2MDdhNTU2MWUyMWUzOWQ5Y2MpLGVsd3BraCh4cHViNkQxTVBxZFJ3WVRocW14WFpnVGE0TWt1QkM2aTdKOGgzeUd2VkVmcnA2eENmQmhrQThKYmhVam9Na2V3QVc4NG51MWsxa1R1OVN3cWZocHFQdXFxa0cxNTVtQng2ejR0Q1BQTHF5MnZaRXMvPDA7MT4vKikpI2Y3NThkeGFrIiwiYyI6IlVTRCIsImciOnRydWV9"
+                    class="hint-link">see example</a></li>
+            <li>💰 Low fees: 0.25% + 50 sats per invoice</li>
+            <li>📖 Easy setup — <a href="docs/" class="hint-link">follow our tutorials →</a></li>
+        </ul>
+
         <form id="setup-form" class="setup-form">
             <div class="form-group">
                 <label for="descriptor">CT Descriptor</label>
                 <textarea id="descriptor" name="descriptor" class="descriptor-input"
                     placeholder="ct(slip77(...),wpkh([fingerprint/84'/1'/0']xpub.../0/*))" rows="4" required></textarea>
-                <small class="form-hint">Enter your Liquid confidential transactions descriptor. <a href="docs/" class="hint-link">How to get it →</a></small>
             </div>
 
             <div class="form-group">

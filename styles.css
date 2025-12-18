@@ -131,6 +131,36 @@ body {
     color: #6c757d;
 }
 
+/* Features List */
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.features-list li {
+    color: #495057;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    border-left: 3px solid #f7931a;
+}
+
+.features-list a {
+    color: #f7931a;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.features-list a:hover {
+    text-decoration: underline;
+}
+
 /* Setup Form */
 .setup-form {
     display: flex;
