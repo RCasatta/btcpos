@@ -16,6 +16,28 @@ const SATOSHIS_PER_BTC: number = 100_000_000;
 const RATE_UPDATE_INTERVAL_MS: number = 60_000; // 1 minute
 const LOCALSTORAGE_FORM_KEY: string = 'btcpos_setup_form';
 
+// =============================================================================
+// Plausible Analytics
+// =============================================================================
+
+// Declare plausible function type (loaded from external script)
+declare function plausible(eventName: string, options?: { props?: Record<string, string | number> }): void;
+
+function trackEvent(eventName: string, props?: Record<string, string | number>): void {
+    if (typeof plausible === 'function') {
+        plausible(eventName, props ? { props } : undefined);
+    }
+}
+
+// Convert satoshi amount to privacy-preserving bucket label
+function satoshiBucket(satoshis: number): string {
+    if (satoshis < 1_000) return '0-1k';           // ~$0-$1 (micro)
+    if (satoshis < 10_000) return '1k-10k';        // ~$1-$10 (small)
+    if (satoshis < 100_000) return '10k-100k';     // ~$10-$100 (medium)
+    if (satoshis < 1_000_000) return '100k-1M';    // ~$100-$1k (large)
+    return '1M+';                                   // ~$1k+ (very large)
+}
+
 // Network configuration (hardcoded to mainnet)
 const network: lwk.Network = lwk.Network.mainnet();
 
@@ -374,6 +396,9 @@ function initSetupPage(): void {
 
             generatedSection.hidden = false;
 
+            // Track successful POS link generation
+            trackEvent('Generate POS Link', { currency: currency });
+
             showMessage('POS link generated successfully!', false);
         } catch (e) {
             showMessage(`Invalid descriptor: ${e}`, true);
@@ -396,6 +421,11 @@ function initSetupPage(): void {
             generatedLinkInput.select();
             document.execCommand('copy');
         }
+    });
+
+    // Open POS link tracking
+    openPosLink.addEventListener('click', () => {
+        trackEvent('Open POS');
     });
 }
 
@@ -630,6 +660,9 @@ function initPosPage(config: POSConfig): void {
             const invoice = await getBoltzSession().invoice(BigInt(satoshis), description, claimAddress);
             console.log('Invoice:', invoice.bolt11Invoice().toString());
             setInvoiceResponse(invoice);
+
+            // Track invoice creation (using bucket for privacy)
+            trackEvent('Create Invoice', { amount: satoshiBucket(satoshis), currency: currencyAlpha3 });
 
             // Navigate to receive page
             initReceivePage(invoice, satoshis, fiatAmount, currencyAlpha3);
@@ -929,6 +962,9 @@ function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmo
             statusText.textContent = 'Payment received!';
             backToPosButton.textContent = '✓ New Payment';
             backToPosButton.classList.remove('secondary-button');
+
+            // Track successful payment (using bucket for privacy)
+            trackEvent('Payment Received', { amount: satoshiBucket(satoshis), currency: currencyAlpha3 });
 
             // Replace QR code with checkmark SVG
             const checkmarkSvg = `data:image/svg+xml,${encodeURIComponent(`
