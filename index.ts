@@ -802,9 +802,14 @@ function initPosPage(config: POSConfig): void {
         }
     }
 
-    // Subscribe to rate changes to update display
+    // Subscribe to rate changes to update display and enable button
     subscribe('exchange-rate-changed', () => {
         formatDisplay();
+        // Enable submit button once we have an exchange rate
+        const rate = getExchangeRate();
+        if (rate && rate > 0) {
+            submitButton.disabled = false;
+        }
     });
 
     // Initialize when WASM is ready
