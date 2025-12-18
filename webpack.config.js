@@ -1,13 +1,13 @@
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require('path');
 
-module.exports = {
+module.exports = (env, argv) => ({
     entry: "./bootstrap.ts",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "bootstrap.js",
     },
-    mode: "development",
+    mode: argv.mode || "development",
     plugins: [
         new CopyWebpackPlugin({ patterns: ["index.html", "styles.css", { from: "docs", to: "docs" }] })
     ],
@@ -16,7 +16,7 @@ module.exports = {
         syncWebAssembly: true
     },
     optimization: {
-        minimize: false,
+        minimize: argv.mode === "production",
     },
     module: {
         rules: [
@@ -33,5 +33,5 @@ module.exports = {
     devServer: {
         port: 8384,
     },
-};
+});
 
