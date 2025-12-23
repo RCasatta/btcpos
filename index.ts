@@ -248,6 +248,74 @@ async function createEsploraClient(): Promise<lwk.EsploraClient> {
 }
 
 // =============================================================================
+// Mnemonic Export (for Boltz recovery)
+// =============================================================================
+
+/**
+ * Downloads the Boltz session mnemonic as a JSON file for swap recovery.
+ * The file format is compatible with boltz.exchange recovery tool.
+ * @param dwid - The wallet's DWID to look up the mnemonic
+ */
+function downloadMnemonicJson(dwid: string): void {
+    const mnemonicKey = `btcpos-mnemonic-${dwid}`;
+    const mnemonic = localStorage.getItem(mnemonicKey);
+
+    if (!mnemonic) {
+        console.warn('No mnemonic found for this wallet');
+        alert('No recovery data available for this wallet.');
+        return;
+    }
+
+    // Create JSON in Boltz-compatible format
+    const recoveryData = JSON.stringify({ mnemonic }, null, 0);
+
+    // Create and trigger download
+    const blob = new Blob([recoveryData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `btcpos-recovery-${dwid}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    console.log('Mnemonic JSON downloaded for recovery');
+}
+
+/**
+ * Sets up a triple-click handler on an element to trigger mnemonic export.
+ * @param element - The element to attach the handler to
+ * @param getDwid - Function to get the current DWID
+ */
+function setupMnemonicExportTrigger(element: HTMLElement, getDwid: () => string | null): void {
+    let clickCount = 0;
+    let clickTimer: number | null = null;
+    const TRIPLE_CLICK_TIMEOUT = 500; // ms
+
+    element.addEventListener('click', () => {
+        clickCount++;
+
+        if (clickTimer) {
+            clearTimeout(clickTimer);
+        }
+
+        if (clickCount === 3) {
+            clickCount = 0;
+            const dwid = getDwid();
+            if (dwid) {
+                downloadMnemonicJson(dwid);
+            }
+        } else {
+            clickTimer = window.setTimeout(() => {
+                clickCount = 0;
+            }, TRIPLE_CLICK_TIMEOUT);
+        }
+    });
+
+}
+
+// =============================================================================
 // Boltz Session
 // =============================================================================
 
@@ -807,6 +875,9 @@ function initPosPage(config: POSConfig): void {
             walletIdDisplay.textContent = dwid;
             console.log(`Wallet initialized with DWID: ${dwid}`);
 
+            // Setup triple-click on wallet ID to export mnemonic for recovery
+            setupMnemonicExportTrigger(walletIdDisplay, () => wollet.dwid());
+
             updateStatusText('Creating Boltz session...');
 
             // Create Boltz session for lightning swaps
@@ -927,10 +998,12 @@ function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmo
     // Display invoice text (lowercase for copy/paste)
     invoiceText.value = bolt11;
 
-    // Show wallet ID
+    // Show wallet ID and setup triple-click for mnemonic export
     const wollet = getWollet();
     if (wollet) {
-        walletIdDisplay.textContent = wollet.dwid();
+        const dwid = wollet.dwid();
+        walletIdDisplay.textContent = dwid;
+        setupMnemonicExportTrigger(walletIdDisplay, () => dwid);
     }
 
     // Copy invoice button
