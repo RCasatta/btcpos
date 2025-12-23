@@ -1236,6 +1236,18 @@ body {
     text-decoration: underline;
 }
 
+.faq-item ul {
+    margin-top: 12px;
+    padding-left: 20px;
+}
+
+.faq-item li {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #495057;
+    line-height: 1.6;
+}
+
 /* Docs mobile responsive */
 @media (max-width: 480px) {
     .tutorial-card {
