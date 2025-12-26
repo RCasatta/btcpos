@@ -931,6 +931,19 @@ body {
     max-width: 600px;
 }
 
+/* Docs/FAQ responsive - expand on larger screens */
+@media (min-width: 768px) {
+    .docs-container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .docs-container {
+        max-width: 800px;
+    }
+}
+
 /* Back link */
 .back-link {
     display: inline-block;
@@ -1236,9 +1249,14 @@ body {
     text-decoration: underline;
 }
 
-.faq-item ul {
+.faq-item ul,
+.faq-item ol {
     margin-top: 12px;
-    padding-left: 20px;
+    padding-left: 24px;
+}
+
+.faq-item ol {
+    list-style-type: decimal;
 }
 
 .faq-item li {
@@ -1246,6 +1264,23 @@ body {
     font-size: 14px;
     color: #495057;
     line-height: 1.6;
+}
+
+.faq-item h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.faq-item code {
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #1a1a2e;
 }
 
 /* Docs mobile responsive */
