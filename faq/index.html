@@ -73,6 +73,37 @@
                     The format is compatible with the <a href="https://boltz.exchange/">Boltz exchange</a> recovery
                     tool.
                 </p>
+            </div>
+
+            <div class="faq-item" id="supply-chain">
+                <h2>Mitigating supply chain attacks</h2>
+                <p>Since btcpos.cash runs entirely in your browser, you're trusting the server to deliver
+                    unmodified code each time you load the page. A compromised server could theoretically
+                    serve malicious code that leaks your descriptor or misdirects payments.</p>
+
+                <p>To mitigate this risk, you can <strong>install the app locally</strong> using your browser's
+                    "Install as app" feature. Once installed, the app runs from your device's cache and no longer
+                    fetches code from the server on each use.</p>
+
+                <p>How to install:</p>
+                <ol>
+                    <li>Configure your POS and generate the link (e.g., <code>https://btcpos.cash/#eyJ...</code>)</li>
+                    <li>In the URL bar, <strong>replace <code>#</code> with <code>?</code></strong>
+                        (e.g., <code>https://btcpos.cash/?eyJ...</code>)</li>
+                    <li>Navigate to the modified URL</li>
+                    <li>In Chrome: click the install icon in the address bar, or use Menu → "Install Bitcoin POS"</li>
+                    <li>The app is now installed with your configuration baked in</li>
+                </ol>
+
+                <p><strong>Why replace # with ?</strong><br>
+                    The <code>#</code> fragment is normally used because it's never sent to the server, protecting
+                    your descriptor privacy. However, browsers strip the <code>#</code> fragment when installing
+                    as an app. Using <code>?</code> preserves the configuration in the installed app's start URL.
+                    The privacy trade-off is minimal since you're already trusting the server at install time.</p>
+
+                <p><strong>Note:</strong> After installation, the app works offline and your configuration
+                    remains private — it's only stored locally on your device.</p>
+            </div>
 
         </section>
 

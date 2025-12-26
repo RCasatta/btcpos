@@ -1077,16 +1077,19 @@ function initErrorPage(message: string): void {
 // =============================================================================
 
 function route(): void {
+    // Check hash first (privacy-preserving), then query string (for PWA install)
     const hash = window.location.hash.slice(1); // Remove the '#'
+    const query = window.location.search.slice(1); // Remove the '?'
+    const configString = hash || query;
 
-    if (!hash) {
-        // No hash = setup page
+    if (!configString) {
+        // No config = setup page
         initSetupPage();
         return;
     }
 
     // Try to decode the config
-    const config = decodeConfig(hash);
+    const config = decodeConfig(configString);
 
     if (!config) {
         initErrorPage('The provided link is invalid or malformed. The configuration data could not be decoded.');
