@@ -1168,11 +1168,77 @@ body {
     font-size: 14px;
 }
 
+/* Tutorial Intro */
+.tutorial-intro {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border-left: 4px solid #f7931a;
+}
+
+.tutorial-intro p {
+    color: #495057;
+    font-size: 15px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Tutorial Warning */
+.tutorial-warning {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+}
+
+.tutorial-warning h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #92400e;
+    margin-bottom: 10px;
+}
+
+.tutorial-warning p {
+    color: #78350f;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.tutorial-warning strong {
+    color: #92400e;
+}
+
+/* Tutorial Security Note */
+.tutorial-note {
+    margin-top: 28px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+    border: 2px solid #68d391;
+    border-radius: 12px;
+}
+
+.tutorial-note h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #276749;
+    margin-bottom: 10px;
+}
+
+.tutorial-note p {
+    color: #2f855a;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
 /* Screenshot Gallery */
 .screenshot-gallery {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 20px;
 }
 
 .screenshot-item {
@@ -1194,6 +1260,30 @@ body {
     width: 100%;
     height: auto;
     display: block;
+}
+
+.screenshot-item figcaption {
+    padding: 16px;
+    background: white;
+}
+
+.screenshot-item figcaption h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+.screenshot-item figcaption p {
+    font-size: 13px;
+    color: #6c757d;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.screenshot-item figcaption strong {
+    color: #1a1a2e;
+    font-weight: 600;
 }
 
 .step-number {
