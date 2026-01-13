@@ -8,7 +8,7 @@
         "deploy": "npm run build && npm run sync"
     },
     "dependencies": {
-        "lwk_wasm": "file:/home/casatta/git/lwk/lwk_wasm/pkg"
+        "lwk_wasm": "^0.13.1"
     },
     "devDependencies": {
         "@eslint/js": "^9.36.0",
