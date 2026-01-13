@@ -1113,8 +1113,11 @@ function route(): void {
 
 async function getClaimAddress(): Promise<lwk.Address> {
     const wollet = getWollet();
-    syncWallet(wollet);
-    const claimAddress = wollet.address(null).address();
+    const client = getEsploraClient();
+    const lastUsedIndex = await client.lastUsedIndex(wollet.descriptor());
+    console.log('Last used indexes:', lastUsedIndex.external, lastUsedIndex.internal);
+    const indexToUse = lastUsedIndex.external != null ? lastUsedIndex.external + 1 : 0;
+    const claimAddress = wollet.address(indexToUse).address();
     return claimAddress;
 }
 
