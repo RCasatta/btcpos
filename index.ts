@@ -867,7 +867,6 @@ function initPosPage(config: POSConfig): void {
             // Create wallet descriptor and wallet
             const wolletDescriptor = new lwk.WolletDescriptor(config.d);
             wollet = new lwk.Wollet(network, wolletDescriptor);
-            await syncWallet(wollet);
             setWollet(wollet);
 
             // Show full wallet ID at bottom
@@ -1119,14 +1118,6 @@ async function getClaimAddress(): Promise<lwk.Address> {
     const indexToUse = lastUsedIndex.external != null ? lastUsedIndex.external + 1 : 0;
     const claimAddress = wollet.address(indexToUse).address();
     return claimAddress;
-}
-
-async function syncWallet(wollet: lwk.Wollet): Promise<void> {
-    const client = getEsploraClient();
-    const update = await client.fullScan(wollet);
-    if (update) {
-        wollet.applyUpdate(update);
-    }
 }
 
 // =============================================================================
