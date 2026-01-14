@@ -16,9 +16,7 @@
 </head>
 
 <body>
-    <!-- Main app container -->
     <main id="app" class="container">
-        <!-- Initial loading state shown before JS loads -->
         <div class="header">
             <div class="bitcoin-symbol">₿</div>
             <h1>Bitcoin POS</h1>
@@ -31,8 +29,36 @@
     <!-- Setup Page Template -->
     <template id="setup-page-template">
         <div class="header">
-            <div class="bitcoin-symbol">₿</div>
-            <h1>Bitcoin POS</h1>
+            <button class="VPSwitch VPSwitchAppearance appearance-toggle" type="button" role="switch" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleTheme()">
+                <span class="check">
+                    <span class="icon">
+                        <span class="vpi-sun sun"></span>
+                        <span class="vpi-moon moon"></span>
+                    </span>
+                </span>
+            </button>
+            <button class="hamburger-menu" onclick="toggleMobileMenu()" aria-label="Menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <div class="mobile-menu">
+                <button class="mobile-menu-item" onclick="toggleTheme()">
+                    <span class="label">Appearance</span>
+                    <span class="VPSwitch VPSwitchAppearance" style="pointer-events: none;">
+                        <span class="check">
+                            <span class="icon">
+                                <span class="vpi-sun sun"></span>
+                                <span class="vpi-moon moon"></span>
+                            </span>
+                        </span>
+                    </span>
+                </button>
+            </div>
+            <div class="header-row">
+                <div class="bitcoin-symbol">₿</div>
+                <h1>Bitcoin POS</h1>
+            </div>
             <p class="subtitle">Configure your Point of Sale</p>
         </div>
 
@@ -117,10 +143,36 @@
     <!-- POS Page Template -->
     <template id="pos-page-template">
         <div class="header">
+            <button class="VPSwitch VPSwitchAppearance appearance-toggle" type="button" role="switch" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleTheme()">
+                <span class="check">
+                    <span class="icon">
+                        <span class="vpi-sun sun"></span>
+                        <span class="vpi-moon moon"></span>
+                    </span>
+                </span>
+            </button>
+            <a href="#" id="setup-link" class="setup-link" title="Back to Setup">⚙️</a>
+            <button class="hamburger-menu" onclick="toggleMobileMenu()" aria-label="Menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <div class="mobile-menu">
+                <button class="mobile-menu-item" onclick="toggleTheme()">
+                    <span class="label">Appearance</span>
+                    <span class="VPSwitch VPSwitchAppearance" style="pointer-events: none;">
+                        <span class="check">
+                            <span class="icon">
+                                <span class="vpi-sun sun"></span>
+                                <span class="vpi-moon moon"></span>
+                            </span>
+                        </span>
+                    </span>
+                </button>
+            </div>
             <div class="header-row">
                 <div class="bitcoin-symbol">₿</div>
                 <h1>Bitcoin POS</h1>
-                <a href="#" id="setup-link" class="setup-link" title="Back to Setup">⚙️</a>
             </div>
         </div>
 
@@ -191,6 +243,32 @@
     <!-- Receive Page Template -->
     <template id="receive-page-template">
         <div class="header">
+            <button class="VPSwitch VPSwitchAppearance appearance-toggle" type="button" role="switch" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleTheme()">
+                <span class="check">
+                    <span class="icon">
+                        <span class="vpi-sun sun"></span>
+                        <span class="vpi-moon moon"></span>
+                    </span>
+                </span>
+            </button>
+            <button class="hamburger-menu" onclick="toggleMobileMenu()" aria-label="Menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <div class="mobile-menu">
+                <button class="mobile-menu-item" onclick="toggleTheme()">
+                    <span class="label">Appearance</span>
+                    <span class="VPSwitch VPSwitchAppearance" style="pointer-events: none;">
+                        <span class="check">
+                            <span class="icon">
+                                <span class="vpi-sun sun"></span>
+                                <span class="vpi-moon moon"></span>
+                            </span>
+                        </span>
+                    </span>
+                </button>
+            </div>
             <div class="header-row">
                 <div class="bitcoin-symbol">₿</div>
                 <h1>Payment Request</h1>
@@ -239,8 +317,36 @@
     <!-- Error Page Template -->
     <template id="error-page-template">
         <div class="header">
-            <div class="bitcoin-symbol">₿</div>
-            <h1>Bitcoin POS</h1>
+            <button class="VPSwitch VPSwitchAppearance appearance-toggle" type="button" role="switch" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleTheme()">
+                <span class="check">
+                    <span class="icon">
+                        <span class="vpi-sun sun"></span>
+                        <span class="vpi-moon moon"></span>
+                    </span>
+                </span>
+            </button>
+            <button class="hamburger-menu" onclick="toggleMobileMenu()" aria-label="Menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <div class="mobile-menu">
+                <button class="mobile-menu-item" onclick="toggleTheme()">
+                    <span class="label">Appearance</span>
+                    <span class="VPSwitch VPSwitchAppearance" style="pointer-events: none;">
+                        <span class="check">
+                            <span class="icon">
+                                <span class="vpi-sun sun"></span>
+                                <span class="vpi-moon moon"></span>
+                            </span>
+                        </span>
+                    </span>
+                </button>
+            </div>
+            <div class="header-row">
+                <div class="bitcoin-symbol">₿</div>
+                <h1>Bitcoin POS</h1>
+            </div>
         </div>
 
         <div class="error-container">
@@ -252,49 +358,75 @@
     </template>
 
     <script>
-        // Dynamic manifest: set manifest href dynamically to include config in start_url
-        // The link starts without href to prevent Chrome from caching the default manifest
+        (function initTheme() {
+            const THEME_KEY = 'btcpos_theme';
+            
+            function getSavedTheme() {
+                try { return localStorage.getItem(THEME_KEY); } catch { return null; }
+            }
+            
+            window.getCurrentTheme = function() {
+                const saved = getSavedTheme();
+                if (saved) return saved;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            };
+            
+            function saveTheme(theme) {
+                try { localStorage.setItem(THEME_KEY, theme); } catch {}
+            }
+            
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+            
+            window.toggleTheme = function() {
+                const current = getCurrentTheme();
+                const next = current === 'dark' ? 'light' : 'dark';
+                saveTheme(next);
+                applyTheme(next);
+            };
+            
+            window.toggleMobileMenu = function() {
+                const btn = document.querySelector('.hamburger-menu');
+                const menu = document.querySelector('.mobile-menu');
+                if (btn && menu) { btn.classList.toggle('open'); menu.classList.toggle('open'); }
+            };
+            
+            window.closeMobileMenu = function() {
+                const btn = document.querySelector('.hamburger-menu');
+                const menu = document.querySelector('.mobile-menu');
+                if (btn && menu) { btn.classList.remove('open'); menu.classList.remove('open'); }
+            };
+            
+            document.addEventListener('click', function(e) {
+                const menu = document.querySelector('.mobile-menu');
+                const btn = document.querySelector('.hamburger-menu');
+                if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) closeMobileMenu();
+            });
+            
+            const saved = getSavedTheme();
+            if (saved) applyTheme(saved);
+        })();
+    </script>
+
+    <script>
         (async function setupDynamicManifest() {
             const manifestLink = document.getElementById('manifest-link');
             if (!manifestLink) return;
-
             try {
                 const response = await fetch('./manifest.json');
                 const manifest = await response.json();
-
-                // Get config from hash (preferred) or query string
                 const configString = window.location.hash.slice(1) || window.location.search.slice(1);
-
-                // Build absolute start_url (required since manifest is a blob URL)
                 const baseUrl = window.location.origin + window.location.pathname;
-                if (configString) {
-                    manifest.start_url = `${baseUrl}?${configString}`;
-                } else {
-                    manifest.start_url = baseUrl;
-                }
-
-                // Create blob URL with manifest and set it
+                manifest.start_url = configString ? `${baseUrl}?${configString}` : baseUrl;
                 const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
                 manifestLink.setAttribute('href', URL.createObjectURL(blob));
-
-                console.log('Manifest set with start_url:', manifest.start_url);
             } catch (error) {
-                console.error('Dynamic manifest error:', error);
-                // Fallback: set static manifest
                 manifestLink.setAttribute('href', './manifest.json');
             }
         })();
-
-        // Register service worker for offline support (production only)
-        if ('serviceWorker' in navigator) {
-            const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-
-            if (!isLocalhost) {
-                // In production: register service worker
-                navigator.serviceWorker.register('./sw.js')
-                    .then(() => console.log('Service Worker registered'))
-                    .catch((err) => console.log('Service Worker registration failed:', err));
-            }
+        if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
         }
     </script>
     <script src="bootstrap.js"></script>

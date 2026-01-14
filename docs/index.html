@@ -13,8 +13,49 @@
 </head>
 
 <body>
+    <script>
+        (function() {
+            const THEME_KEY = 'btcpos_theme';
+            function getSavedTheme() { try { return localStorage.getItem(THEME_KEY); } catch { return null; } }
+            window.getCurrentTheme = function() { const s = getSavedTheme(); if (s) return s; return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; };
+            function saveTheme(t) { try { localStorage.setItem(THEME_KEY, t); } catch {} }
+            function applyTheme(t) { document.documentElement.setAttribute('data-theme', t); }
+            window.toggleTheme = function() { const c = getCurrentTheme(); const n = c === 'dark' ? 'light' : 'dark'; saveTheme(n); applyTheme(n); };
+            window.toggleMobileMenu = function() { const b = document.querySelector('.hamburger-menu'); const m = document.querySelector('.mobile-menu'); if (b && m) { b.classList.toggle('open'); m.classList.toggle('open'); } };
+            window.closeMobileMenu = function() { const b = document.querySelector('.hamburger-menu'); const m = document.querySelector('.mobile-menu'); if (b && m) { b.classList.remove('open'); m.classList.remove('open'); } };
+            document.addEventListener('click', function(e) { const m = document.querySelector('.mobile-menu'); const b = document.querySelector('.hamburger-menu'); if (m && b && !m.contains(e.target) && !b.contains(e.target)) closeMobileMenu(); });
+            const saved = getSavedTheme(); if (saved) applyTheme(saved);
+        })();
+    </script>
+
     <main class="container docs-container">
         <header class="header">
+            <button class="VPSwitch VPSwitchAppearance appearance-toggle" type="button" role="switch" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleTheme()">
+                <span class="check">
+                    <span class="icon">
+                        <span class="vpi-sun sun"></span>
+                        <span class="vpi-moon moon"></span>
+                    </span>
+                </span>
+            </button>
+            <button class="hamburger-menu" onclick="toggleMobileMenu()" aria-label="Menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <div class="mobile-menu">
+                <button class="mobile-menu-item" onclick="toggleTheme()">
+                    <span class="label">Appearance</span>
+                    <span class="VPSwitch VPSwitchAppearance" style="pointer-events: none;">
+                        <span class="check">
+                            <span class="icon">
+                                <span class="vpi-sun sun"></span>
+                                <span class="vpi-moon moon"></span>
+                            </span>
+                        </span>
+                    </span>
+                </button>
+            </div>
             <a href="../" class="back-link">← Back to Setup</a>
             <div class="bitcoin-symbol">₿</div>
             <h1>CT Descriptor Tutorials</h1>
