@@ -169,41 +169,40 @@ function renderTemplate(templateId: string): void {
 // Exchange Rate Fetching
 // =============================================================================
 
-async function fetchExchangeRate(): Promise<void> {
+async function fetchExchangeRate(): Promise<number | null> {
     const currencyCode = getCurrencyCode();
     const pricesFetcher = getPricesFetcher();
 
     if (!currencyCode || !pricesFetcher) {
-        return;
+        return null;
     }
 
     try {
         const rates = await pricesFetcher.rates(currencyCode);
         const median = rates.median();
-        setExchangeRate(median);
-
-        // Update UI
-        const rateValue = document.getElementById('rate-value');
-        if (rateValue) {
-            rateValue.textContent = median.toLocaleString('en-US', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            });
-        }
+        return median;
     } catch (e) {
         console.error('Failed to fetch exchange rate:', e);
+        return null;
     }
+}
+
+async function refreshExchangeRate(): Promise<void> {
+    const median = await fetchExchangeRate();
+    setExchangeRate(median);
 }
 
 function startRateUpdates(): void {
     // Fetch immediately
-    fetchExchangeRate();
+    void refreshExchangeRate();
 
     // Then fetch every minute
     if (rateUpdateInterval) {
         clearInterval(rateUpdateInterval);
     }
-    rateUpdateInterval = window.setInterval(fetchExchangeRate, RATE_UPDATE_INTERVAL_MS);
+    rateUpdateInterval = window.setInterval(() => {
+        void refreshExchangeRate();
+    }, RATE_UPDATE_INTERVAL_MS);
 }
 
 function stopRateUpdates(): void {
@@ -894,7 +893,8 @@ function initPosPage(config: POSConfig): void {
                     console.log('Boltz session created');
                 }),
                 // Fetch exchange rate in parallel (doesn't depend on Boltz)
-                fetchExchangeRate().then(() => {
+                fetchExchangeRate().then(rate => {
+                    setExchangeRate(rate);
                     console.log('Initial exchange rate fetched');
                 })
             ]);
@@ -903,7 +903,9 @@ function initPosPage(config: POSConfig): void {
             if (rateUpdateInterval) {
                 clearInterval(rateUpdateInterval);
             }
-            rateUpdateInterval = window.setInterval(fetchExchangeRate, RATE_UPDATE_INTERVAL_MS);
+            rateUpdateInterval = window.setInterval(() => {
+                void refreshExchangeRate();
+            }, RATE_UPDATE_INTERVAL_MS);
 
             // Hide loading status
             wasmStatus.classList.add('hidden');
@@ -919,11 +921,21 @@ function initPosPage(config: POSConfig): void {
     }
 
     // Subscribe to rate changes to update display and enable button
-    subscribe('exchange-rate-changed', () => {
+    subscribe('exchange-rate-changed', (data: unknown) => {
+        const rate = (typeof data === 'number' && data > 0) ? data : null;
+
+        // Update rate display (if present)
+        const rateValue = document.getElementById('rate-value');
+        if (rateValue) {
+            rateValue.textContent = rate
+                ? rate.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                : '--';
+        }
+
         formatDisplay();
         // Enable submit button once we have an exchange rate
-        const rate = getExchangeRate();
-        if (rate && rate > 0) {
+        const currentRate = getExchangeRate();
+        if (currentRate && currentRate > 0) {
             submitButton.disabled = false;
         }
     });
