@@ -877,22 +877,33 @@ function initPosPage(config: POSConfig): void {
             // Setup triple-click on wallet ID to export mnemonic for recovery
             setupMnemonicExportTrigger(walletIdDisplay, () => wollet.dwid());
 
-            updateStatusText('Creating Boltz session...');
-
-            // Create Boltz session for lightning swaps
-            boltzSession = await createBoltzSession(wollet, esploraClient);
-            setBoltzSession(boltzSession);
-            console.log('Boltz session created');
-
-            // Initialize currency and price fetcher
+            // Initialize currency and price fetcher (no async dependencies)
             const currencyCode = new lwk.CurrencyCode(currencyAlpha3);
             setCurrencyCode(currencyCode);
 
             const pricesFetcher = new lwk.PricesFetcher();
             setPricesFetcher(pricesFetcher);
 
-            // Start rate updates
-            startRateUpdates();
+            // Start Boltz session creation and rate fetching in parallel
+            updateStatusText('Creating Boltz session...');
+
+            await Promise.all([
+                // Create Boltz session for lightning swaps
+                createBoltzSession(wollet, esploraClient).then(session => {
+                    setBoltzSession(session);
+                    console.log('Boltz session created');
+                }),
+                // Fetch exchange rate in parallel (doesn't depend on Boltz)
+                fetchExchangeRate().then(() => {
+                    console.log('Initial exchange rate fetched');
+                })
+            ]);
+
+            // Start periodic rate updates (first fetch already done above)
+            if (rateUpdateInterval) {
+                clearInterval(rateUpdateInterval);
+            }
+            rateUpdateInterval = window.setInterval(fetchExchangeRate, RATE_UPDATE_INTERVAL_MS);
 
             // Hide loading status
             wasmStatus.classList.add('hidden');
