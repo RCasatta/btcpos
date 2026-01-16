@@ -1,5 +1,5 @@
 // Service Worker for Bitcoin POS - enables offline functionality
-const CACHE_NAME = 'btcpos-v1';
+const CACHE_NAME = 'btcpos-v3';
 
 // Files to cache on install
 const STATIC_ASSETS = [
