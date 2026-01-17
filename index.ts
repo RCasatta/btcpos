@@ -192,9 +192,11 @@ async function refreshExchangeRate(): Promise<void> {
     setExchangeRate(median);
 }
 
-function startRateUpdates(): void {
-    // Fetch immediately
-    void refreshExchangeRate();
+function startRateUpdates(immediate: boolean = true): void {
+    // Fetch immediately (optional)
+    if (immediate) {
+        void refreshExchangeRate();
+    }
 
     // Then fetch every minute
     if (rateUpdateInterval) {
@@ -900,12 +902,7 @@ function initPosPage(config: POSConfig): void {
             ]);
 
             // Start periodic rate updates (first fetch already done above)
-            if (rateUpdateInterval) {
-                clearInterval(rateUpdateInterval);
-            }
-            rateUpdateInterval = window.setInterval(() => {
-                void refreshExchangeRate();
-            }, RATE_UPDATE_INTERVAL_MS);
+            startRateUpdates(false);
 
             // Hide loading status
             wasmStatus.classList.add('hidden');
