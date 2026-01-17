@@ -728,7 +728,27 @@ function initPosPage(config: POSConfig): void {
             const claimAddress = await getClaimAddress();
             console.log('Claim address:', claimAddress.toString());
 
-            const invoice = await getBoltzSession().invoice(BigInt(satoshis), description, claimAddress);
+            let invoice: lwk.InvoiceResponse;
+            try {
+                invoice = await getBoltzSession().invoice(BigInt(satoshis), description, claimAddress);
+            } catch (invoiceError) {
+                // Handle preimage hash collision (e.g., two PoS instances open simultaneously)
+                const errorMessage = String(invoiceError);
+                if (errorMessage.includes('preimage hash exists already')) {
+                    console.log('Preimage hash collision detected, recreating Boltz session...');
+                    const wollet = getWollet();
+                    const esploraClient = getEsploraClient();
+                    if (!wollet || !esploraClient) {
+                        throw new Error('Wallet or Esplora client not initialized');
+                    }
+                    const newSession = await createBoltzSession(wollet, esploraClient);
+                    setBoltzSession(newSession);
+                    console.log('Boltz session recreated, retrying invoice creation...');
+                    invoice = await newSession.invoice(BigInt(satoshis), description, claimAddress);
+                } else {
+                    throw invoiceError;
+                }
+            }
             console.log('Invoice:', invoice.bolt11Invoice().toString());
             setInvoiceResponse(invoice);
 
