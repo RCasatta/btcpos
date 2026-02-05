@@ -42,6 +42,22 @@
                     this is the step that requires the payment of the fees.</p>
             </div>
 
+            <div class="faq-item" id="privacy-link">
+                <h2>Does sharing my POS link leak privacy?</h2>
+                <p>Yes. Your configured POS link contains your CT descriptor. Anyone who gets that link (a “power
+                    user”) can use it in watch-only mode to derive your receiving addresses and list wallet
+                    transactions. This is undesirable because it leaks your business activity.</p>
+                <p>Some descriptors are even worse: a <strong>view descriptor</strong> (for example one containing a
+                    private blinding key / SLIP77 key) allows the holder to also <strong>unblind</strong> amounts and
+                    assets and therefore compute your balance.</p>
+                <p>If your wallet supports them, prefer <strong>non-view descriptors</strong> as described in
+                    <a href="https://github.com/ElementsProject/ELIPs/blob/main/elip-0150.mediawiki">ELIP-0150</a>.
+                    A non-view descriptor still lets someone derive blinded addresses and detect related transactions,
+                    but it does <strong>not</strong> give the capability to unblind transactions. In other words, it can
+                    fetch wallet transactions but cannot calculate the balance.
+                </p>
+            </div>
+
             <div class="faq-item" id="fees">
                 <h2>Why are there fees?</h2>
                 <p>The fee of 0.25% + 50 sats per invoice is charged entirely by the
