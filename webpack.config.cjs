@@ -10,7 +10,7 @@ module.exports = (env, argv) => ({
     mode: argv.mode || "development",
     plugins: [
         new CopyWebpackPlugin({
-            patterns: ["index.html", "styles.css",
+            patterns: ["index.html", "styles.css", "components.js",
                 "manifest.json", "sw.js",
                 "sitemap.xml", "robots.txt",
                 { from: "docs", to: "docs" },

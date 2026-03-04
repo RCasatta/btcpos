@@ -7,6 +7,11 @@ html {
     color-scheme: light dark
 }
 
+btcpos-header:not(:defined),
+btcpos-footer:not(:defined) {
+    display: none;
+}
+
 * {
     margin: 0;
     padding: 0;

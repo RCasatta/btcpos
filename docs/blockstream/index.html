@@ -12,16 +12,13 @@
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="../../styles.css">
     <script defer data-domain="btcpos.cash" src="https://plausible.casatta.it/js/script.js"></script>
+    <script src="../../components.js"></script>
 </head>
 
 <body>
     <main class="container docs-container">
-        <header class="header">
-            <a href="../" class="back-link">← Back to Tutorials</a>
-            <div class="bitcoin-symbol">₿</div>
-            <h1>Blockstream Green</h1>
-            <p class="subtitle">Export your CT descriptor from Blockstream Green wallet</p>
-        </header>
+        <btcpos-header back-href="../" back-text="Back to Tutorials" title="Blockstream Green"
+            subtitle="Export your CT descriptor from Blockstream Green wallet"></btcpos-header>
 
         <section class="tutorial-intro">
             <p>Blockstream Green is a secure Bitcoin wallet developed by Blockstream, the company behind the Liquid
@@ -86,9 +83,9 @@
                 give anyone the ability to spend your funds.</p>
         </section>
 
-        <footer class="docs-footer">
+        <btcpos-footer>
             <a href="../../" class="back-link">← Back to Bitcoin POS Setup</a>
-        </footer>
+        </btcpos-footer>
     </main>
 </body>
 
