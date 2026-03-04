@@ -13,6 +13,7 @@
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="styles.css">
     <script defer data-domain="btcpos.cash" src="https://plausible.casatta.it/js/script.js"></script>
+    <script src="components.js"></script>
 </head>
 
 <body>
@@ -31,8 +32,11 @@
     <!-- Setup Page Template -->
     <template id="setup-page-template">
         <div class="header">
-            <div class="bitcoin-symbol">₿</div>
-            <h1>Bitcoin POS</h1>
+            <btcpos-theme-toggle></btcpos-theme-toggle>
+            <div class="header-row">
+                <div class="bitcoin-symbol">₿</div>
+                <h1>Bitcoin POS</h1>
+            </div>
             <p class="subtitle">Configure your Point of Sale</p>
         </div>
 
@@ -117,10 +121,11 @@
     <!-- POS Page Template -->
     <template id="pos-page-template">
         <div class="header">
+            <btcpos-theme-toggle></btcpos-theme-toggle>
+            <a href="#" id="setup-link" class="setup-link" title="Back to Setup">⚙️</a>
             <div class="header-row">
                 <div class="bitcoin-symbol">₿</div>
                 <h1>Bitcoin POS</h1>
-                <a href="#" id="setup-link" class="setup-link" title="Back to Setup">⚙️</a>
             </div>
         </div>
 
@@ -191,6 +196,7 @@
     <!-- Receive Page Template -->
     <template id="receive-page-template">
         <div class="header">
+            <btcpos-theme-toggle></btcpos-theme-toggle>
             <div class="header-row">
                 <div class="bitcoin-symbol">₿</div>
                 <h1>Payment Request</h1>
@@ -239,8 +245,11 @@
     <!-- Error Page Template -->
     <template id="error-page-template">
         <div class="header">
-            <div class="bitcoin-symbol">₿</div>
-            <h1>Bitcoin POS</h1>
+            <btcpos-theme-toggle></btcpos-theme-toggle>
+            <div class="header-row">
+                <div class="bitcoin-symbol">₿</div>
+                <h1>Bitcoin POS</h1>
+            </div>
         </div>
 
         <div class="error-container">

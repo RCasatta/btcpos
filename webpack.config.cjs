@@ -37,7 +37,7 @@ module.exports = (env, argv) => ({
         extensions: ['.ts', '.js']
     },
     devServer: {
-        port: 8384,
+        port: 8394,
     },
 });
 
