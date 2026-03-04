@@ -11,8 +11,28 @@ html[data-theme="light"] {
     color-scheme: light;
 }
 
+html[data-theme="light"] body {
+    color: #374151;
+}
+
 html[data-theme="dark"] {
     color-scheme: dark;
+}
+
+html[data-theme="dark"] body {
+    color: #d1d5db;
+}
+
+@media (prefers-color-scheme: light) {
+    html:not([data-theme]) body {
+        color: #374151;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-theme]) body {
+        color: #d1d5db;
+    }
 }
 
 btcpos-header:not(:defined),
