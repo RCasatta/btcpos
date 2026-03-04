@@ -82,9 +82,10 @@ interface POSConfig {
     c: string; // currency code (alpha3)
     g?: boolean; // show gear (optional, defaults to false)
     n?: boolean; // show note/description (optional, defaults to true)
+    l?: string; // logo URL (optional)
 }
 
-function encodeConfig(descriptor: string, currency: string, showGear: boolean, showDescription: boolean): string {
+function encodeConfig(descriptor: string, currency: string, showGear: boolean, showDescription: boolean, logoUrl: string): string {
     const config: POSConfig = { d: descriptor, c: currency };
     // Only include 'g' if true to keep URL shorter when false (default)
     if (showGear) {
@@ -93,6 +94,10 @@ function encodeConfig(descriptor: string, currency: string, showGear: boolean, s
     // Only include 'n' if false to keep URL shorter when true (default)
     if (!showDescription) {
         config.n = false;
+    }
+    // Only include 'l' if present to keep URL shorter when empty (default)
+    if (logoUrl) {
+        config.l = logoUrl;
     }
     return base64UrlEncode(JSON.stringify(config));
 }
@@ -112,6 +117,10 @@ function decodeConfig(encoded: string): POSConfig | null {
         if (typeof config.n !== 'boolean') {
             config.n = true;
         }
+        // Default logo URL to empty if not present
+        if (typeof config.l !== 'string') {
+            config.l = '';
+        }
         return config;
     } catch {
         return null;
@@ -122,15 +131,27 @@ function decodeConfig(encoded: string): POSConfig | null {
 // LocalStorage helpers
 // =============================================================================
 
-function saveFormToLocalStorage(descriptor: string, currency: string, showGear: boolean, showDescription: boolean): void {
+function saveFormToLocalStorage(
+    descriptor: string,
+    currency: string,
+    showGear: boolean,
+    showDescription: boolean,
+    logoUrl: string
+): void {
     try {
-        localStorage.setItem(LOCALSTORAGE_FORM_KEY, JSON.stringify({ descriptor, currency, showGear, showDescription }));
+        localStorage.setItem(LOCALSTORAGE_FORM_KEY, JSON.stringify({ descriptor, currency, showGear, showDescription, logoUrl }));
     } catch {
         // Ignore storage errors
     }
 }
 
-function loadFormFromLocalStorage(): { descriptor: string; currency: string; showGear: boolean; showDescription: boolean } | null {
+function loadFormFromLocalStorage(): {
+    descriptor: string;
+    currency: string;
+    showGear: boolean;
+    showDescription: boolean;
+    logoUrl: string;
+} | null {
     try {
         const data = localStorage.getItem(LOCALSTORAGE_FORM_KEY);
         if (data) {
@@ -142,6 +163,10 @@ function loadFormFromLocalStorage(): { descriptor: string; currency: string; sho
             // Handle old format without showDescription
             if (typeof parsed.showDescription !== 'boolean') {
                 parsed.showDescription = true;
+            }
+            // Handle old format without logoUrl
+            if (typeof parsed.logoUrl !== 'string') {
+                parsed.logoUrl = '';
             }
             return parsed;
         }
@@ -357,6 +382,7 @@ function initSetupPage(): void {
     const form = document.getElementById('setup-form') as HTMLFormElement;
     const descriptorInput = document.getElementById('descriptor') as HTMLTextAreaElement;
     const currencySelect = document.getElementById('currency') as HTMLSelectElement;
+    const logoUrlInput = document.getElementById('logo-url') as HTMLInputElement;
     const showGearCheckbox = document.getElementById('show-gear') as HTMLInputElement;
     const showDescriptionCheckbox = document.getElementById('show-description') as HTMLInputElement;
     const generateButton = document.getElementById('generate-link') as HTMLButtonElement;
@@ -374,6 +400,7 @@ function initSetupPage(): void {
     if (savedForm) {
         descriptorInput.value = savedForm.descriptor;
         currencySelect.value = savedForm.currency;
+        logoUrlInput.value = savedForm.logoUrl;
         showGearCheckbox.checked = savedForm.showGear;
         showDescriptionCheckbox.checked = savedForm.showDescription;
     }
@@ -418,12 +445,27 @@ function initSetupPage(): void {
 
         const descriptor = descriptorInput.value.trim();
         const currency = currencySelect.value;
+        const logoUrl = logoUrlInput.value.trim();
         const showGear = showGearCheckbox.checked;
         const showDescription = showDescriptionCheckbox.checked;
 
         if (!descriptor) {
             showMessage('Please enter a CT descriptor', true);
             return;
+        }
+
+        // Validate optional logo URL
+        if (logoUrl) {
+            try {
+                const parsedUrl = new URL(logoUrl);
+                if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+                    showMessage('Logo URL must start with http:// or https://', true);
+                    return;
+                }
+            } catch {
+                showMessage('Please enter a valid logo URL', true);
+                return;
+            }
         }
 
         // Validate descriptor using LWK
@@ -449,10 +491,10 @@ function initSetupPage(): void {
             }
 
             // Save form data
-            saveFormToLocalStorage(descriptorReEncoded, currency, showGear, showDescription);
+            saveFormToLocalStorage(descriptorReEncoded, currency, showGear, showDescription, logoUrl);
 
             // Generate the link
-            const encoded = encodeConfig(descriptorReEncoded, currency, showGear, showDescription);
+            const encoded = encodeConfig(descriptorReEncoded, currency, showGear, showDescription, logoUrl);
             const baseUrl = window.location.origin + window.location.pathname;
             const posLink = `${baseUrl}#${encoded}`;
 
@@ -524,6 +566,8 @@ function initPosPage(config: POSConfig): void {
     const submitButton = document.getElementById('submit') as HTMLButtonElement;
     const walletIdDisplay = document.getElementById('wallet-id') as HTMLSpanElement;
     const setupLink = document.getElementById('setup-link') as HTMLAnchorElement;
+    const logoImage = document.getElementById('pos-logo') as HTMLImageElement;
+    const bitcoinSymbol = document.getElementById('pos-bitcoin-symbol') as HTMLDivElement;
     const wasmStatus = document.getElementById('wasm-status') as HTMLDivElement;
     const modeFiatButton = document.getElementById('mode-fiat') as HTMLButtonElement;
     const modeSatsButton = document.getElementById('mode-sats') as HTMLButtonElement;
@@ -539,6 +583,20 @@ function initPosPage(config: POSConfig): void {
     const descriptionSection = descriptionInput.parentElement as HTMLDivElement;
     if (!config.n) {
         descriptionSection.style.display = 'none';
+    }
+
+    // Show custom logo if configured, otherwise fallback to bitcoin symbol
+    if (config.l) {
+        logoImage.onerror = () => {
+            logoImage.style.display = 'none';
+            bitcoinSymbol.style.display = 'block';
+        };
+        logoImage.src = config.l;
+        logoImage.style.display = 'block';
+        bitcoinSymbol.style.display = 'none';
+    } else {
+        logoImage.style.display = 'none';
+        bitcoinSymbol.style.display = 'block';
     }
 
     // Set fixed currency

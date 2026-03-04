@@ -322,6 +322,14 @@ body {
     text-shadow: 0 2px 8px rgba(247, 147, 26, 0.3);
 }
 
+.header .pos-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: contain;
+    display: none;
+}
+
 
 .setup-link {
     font-size: 20px;
@@ -500,6 +508,21 @@ body {
 }
 
 .currency-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(247, 147, 26, 0.15);
+}
+
+.url-input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.url-input:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(247, 147, 26, 0.15);
 }

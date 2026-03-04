@@ -73,6 +73,13 @@
                 </select>
             </div>
 
+            <div class="form-group">
+                <label for="logo-url">Logo URL (optional)</label>
+                <input type="url" id="logo-url" name="logo-url" class="url-input"
+                    placeholder="https://example.com/logo.png">
+                <small class="form-hint">Displayed in the POS header for your brand</small>
+            </div>
+
             <div class="form-group checkbox-group">
                 <label class="checkbox-label">
                     <input type="checkbox" id="show-gear" name="show-gear">
@@ -124,7 +131,8 @@
             <btcpos-theme-toggle></btcpos-theme-toggle>
             <a href="#" id="setup-link" class="setup-link" title="Back to Setup">⚙️</a>
             <div class="header-row">
-                <div class="bitcoin-symbol">₿</div>
+                <img id="pos-logo" class="pos-logo" alt="Shop logo">
+                <div class="bitcoin-symbol" id="pos-bitcoin-symbol">₿</div>
                 <h1>Bitcoin POS</h1>
             </div>
         </div>
