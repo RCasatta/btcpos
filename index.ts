@@ -84,9 +84,10 @@ interface POSConfig {
     n?: boolean; // show note/description (optional, defaults to true)
     l?: string; // logo URL (optional)
     q?: [string, number][]; // quick items: [name, fiatAmount]
+    t?: string; // custom title (optional, defaults to "Bitcoin POS")
 }
 
-function encodeConfig(descriptor: string, currency: string, showGear: boolean, showDescription: boolean, logoUrl: string, quickItems: [string, number][]): string {
+function encodeConfig(descriptor: string, currency: string, showGear: boolean, showDescription: boolean, logoUrl: string, quickItems: [string, number][], title: string): string {
     const config: POSConfig = { d: descriptor, c: currency };
     // Only include 'g' if true to keep URL shorter when false (default)
     if (showGear) {
@@ -103,6 +104,10 @@ function encodeConfig(descriptor: string, currency: string, showGear: boolean, s
     // Only include 'q' if there are items
     if (quickItems.length > 0) {
         config.q = quickItems;
+    }
+    // Only include 't' if different from default
+    if (title) {
+        config.t = title;
     }
     return base64UrlEncode(JSON.stringify(config));
 }
@@ -130,6 +135,10 @@ function decodeConfig(encoded: string): POSConfig | null {
         if (!Array.isArray(config.q)) {
             config.q = [];
         }
+        // Default title to empty (means "Bitcoin POS")
+        if (typeof config.t !== 'string') {
+            config.t = '';
+        }
         return config;
     } catch {
         return null;
@@ -146,10 +155,11 @@ function saveFormToLocalStorage(
     showGear: boolean,
     showDescription: boolean,
     logoUrl: string,
-    quickItems: [string, number][]
+    quickItems: [string, number][],
+    title: string
 ): void {
     try {
-        localStorage.setItem(LOCALSTORAGE_FORM_KEY, JSON.stringify({ descriptor, currency, showGear, showDescription, logoUrl, quickItems }));
+        localStorage.setItem(LOCALSTORAGE_FORM_KEY, JSON.stringify({ descriptor, currency, showGear, showDescription, logoUrl, quickItems, title }));
     } catch {
         // Ignore storage errors
     }
@@ -162,6 +172,7 @@ function loadFormFromLocalStorage(): {
     showDescription: boolean;
     logoUrl: string;
     quickItems: [string, number][];
+    title: string;
 } | null {
     try {
         const data = localStorage.getItem(LOCALSTORAGE_FORM_KEY);
@@ -182,6 +193,10 @@ function loadFormFromLocalStorage(): {
             // Handle old format without quickItems
             if (!Array.isArray(parsed.quickItems)) {
                 parsed.quickItems = [];
+            }
+            // Handle old format without title
+            if (typeof parsed.title !== 'string') {
+                parsed.title = '';
             }
             return parsed;
         }
@@ -398,6 +413,7 @@ function initSetupPage(): void {
     const descriptorInput = document.getElementById('descriptor') as HTMLTextAreaElement;
     const currencySelect = document.getElementById('currency') as HTMLSelectElement;
     const logoUrlInput = document.getElementById('logo-url') as HTMLInputElement;
+    const titleInput = document.getElementById('pos-title') as HTMLInputElement;
     const showGearCheckbox = document.getElementById('show-gear') as HTMLInputElement;
     const showDescriptionCheckbox = document.getElementById('show-description') as HTMLInputElement;
     const generateButton = document.getElementById('generate-link') as HTMLButtonElement;
@@ -445,6 +461,7 @@ function initSetupPage(): void {
         descriptorInput.value = savedForm.descriptor;
         currencySelect.value = savedForm.currency;
         logoUrlInput.value = savedForm.logoUrl;
+        titleInput.value = savedForm.title;
         showGearCheckbox.checked = savedForm.showGear;
         showDescriptionCheckbox.checked = savedForm.showDescription;
         for (const [name, amount] of savedForm.quickItems) {
@@ -493,6 +510,7 @@ function initSetupPage(): void {
         const descriptor = descriptorInput.value.trim();
         const currency = currencySelect.value;
         const logoUrl = logoUrlInput.value.trim();
+        const title = titleInput.value.trim();
         const showGear = showGearCheckbox.checked;
         const showDescription = showDescriptionCheckbox.checked;
 
@@ -539,10 +557,10 @@ function initSetupPage(): void {
 
             // Save form data
             const quickItems = getQuickItems();
-            saveFormToLocalStorage(descriptorReEncoded, currency, showGear, showDescription, logoUrl, quickItems);
+            saveFormToLocalStorage(descriptorReEncoded, currency, showGear, showDescription, logoUrl, quickItems, title);
 
             // Generate the link
-            const encoded = encodeConfig(descriptorReEncoded, currency, showGear, showDescription, logoUrl, quickItems);
+            const encoded = encodeConfig(descriptorReEncoded, currency, showGear, showDescription, logoUrl, quickItems, title);
             const baseUrl = window.location.origin + window.location.pathname;
             const posLink = `${baseUrl}#${encoded}`;
 
@@ -621,6 +639,12 @@ function initPosPage(config: POSConfig): void {
     const modeSatsButton = document.getElementById('mode-sats') as HTMLButtonElement;
     const primaryDisplay = document.getElementById('primary-display') as HTMLDivElement;
     const secondaryDisplay = document.getElementById('secondary-display') as HTMLDivElement;
+    const posTitleDisplay = document.getElementById('pos-title') as HTMLHeadingElement;
+
+    // Set custom title if configured
+    if (config.t) {
+        posTitleDisplay.textContent = config.t;
+    }
 
     // Show/hide setup gear based on config
     if (!config.g) {

@@ -80,6 +80,13 @@
                 <small class="form-hint">Displayed in the POS header for your brand</small>
             </div>
 
+            <div class="form-group">
+                <label for="pos-title">Title (optional)</label>
+                <input type="text" id="pos-title" name="pos-title" class="url-input"
+                    placeholder="Bitcoin POS" maxlength="40">
+                <small class="form-hint">Custom title shown in the POS header</small>
+            </div>
+
             <div class="form-group checkbox-group">
                 <label class="checkbox-label">
                     <input type="checkbox" id="show-gear" name="show-gear">
@@ -140,7 +147,7 @@
             <div class="header-row">
                 <img id="pos-logo" class="pos-logo" alt="Shop logo">
                 <div class="bitcoin-symbol" id="pos-bitcoin-symbol">₿</div>
-                <h1>Bitcoin POS</h1>
+                <h1 id="pos-title">Bitcoin POS</h1>
             </div>
         </div>
 
