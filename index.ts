@@ -83,9 +83,10 @@ interface POSConfig {
     g?: boolean; // show gear (optional, defaults to false)
     n?: boolean; // show note/description (optional, defaults to true)
     l?: string; // logo URL (optional)
+    q?: [string, number][]; // quick items: [name, fiatAmount]
 }
 
-function encodeConfig(descriptor: string, currency: string, showGear: boolean, showDescription: boolean, logoUrl: string): string {
+function encodeConfig(descriptor: string, currency: string, showGear: boolean, showDescription: boolean, logoUrl: string, quickItems: [string, number][]): string {
     const config: POSConfig = { d: descriptor, c: currency };
     // Only include 'g' if true to keep URL shorter when false (default)
     if (showGear) {
@@ -98,6 +99,10 @@ function encodeConfig(descriptor: string, currency: string, showGear: boolean, s
     // Only include 'l' if present to keep URL shorter when empty (default)
     if (logoUrl) {
         config.l = logoUrl;
+    }
+    // Only include 'q' if there are items
+    if (quickItems.length > 0) {
+        config.q = quickItems;
     }
     return base64UrlEncode(JSON.stringify(config));
 }
@@ -121,6 +126,10 @@ function decodeConfig(encoded: string): POSConfig | null {
         if (typeof config.l !== 'string') {
             config.l = '';
         }
+        // Default quick items to empty array if not present
+        if (!Array.isArray(config.q)) {
+            config.q = [];
+        }
         return config;
     } catch {
         return null;
@@ -136,10 +145,11 @@ function saveFormToLocalStorage(
     currency: string,
     showGear: boolean,
     showDescription: boolean,
-    logoUrl: string
+    logoUrl: string,
+    quickItems: [string, number][]
 ): void {
     try {
-        localStorage.setItem(LOCALSTORAGE_FORM_KEY, JSON.stringify({ descriptor, currency, showGear, showDescription, logoUrl }));
+        localStorage.setItem(LOCALSTORAGE_FORM_KEY, JSON.stringify({ descriptor, currency, showGear, showDescription, logoUrl, quickItems }));
     } catch {
         // Ignore storage errors
     }
@@ -151,6 +161,7 @@ function loadFormFromLocalStorage(): {
     showGear: boolean;
     showDescription: boolean;
     logoUrl: string;
+    quickItems: [string, number][];
 } | null {
     try {
         const data = localStorage.getItem(LOCALSTORAGE_FORM_KEY);
@@ -167,6 +178,10 @@ function loadFormFromLocalStorage(): {
             // Handle old format without logoUrl
             if (typeof parsed.logoUrl !== 'string') {
                 parsed.logoUrl = '';
+            }
+            // Handle old format without quickItems
+            if (!Array.isArray(parsed.quickItems)) {
+                parsed.quickItems = [];
             }
             return parsed;
         }
@@ -394,6 +409,35 @@ function initSetupPage(): void {
     const qrImage = document.getElementById('qr-image') as HTMLImageElement;
     const qrLink = document.getElementById('qr-link') as HTMLAnchorElement;
     const openPosLink = document.getElementById('open-pos-link') as HTMLAnchorElement;
+    const quickItemsList = document.getElementById('quick-items-list') as HTMLDivElement;
+    const addQuickItemButton = document.getElementById('add-quick-item') as HTMLButtonElement;
+
+    // Quick items editor helpers
+    function addQuickItemRow(name: string = '', amount: number | string = ''): void {
+        const row = document.createElement('div');
+        row.className = 'quick-item-row';
+        row.innerHTML = `
+            <input type="text" class="quick-item-name" placeholder="Name" value="${name}" maxlength="30">
+            <input type="number" class="quick-item-amount" placeholder="Price" value="${amount}" min="0" step="any">
+            <button type="button" class="quick-item-remove" title="Remove">✕</button>
+        `;
+        row.querySelector('.quick-item-remove')!.addEventListener('click', () => row.remove());
+        quickItemsList.appendChild(row);
+    }
+
+    function getQuickItems(): [string, number][] {
+        const items: [string, number][] = [];
+        quickItemsList.querySelectorAll('.quick-item-row').forEach((row) => {
+            const name = (row.querySelector('.quick-item-name') as HTMLInputElement).value.trim();
+            const amount = parseFloat((row.querySelector('.quick-item-amount') as HTMLInputElement).value);
+            if (name && !isNaN(amount) && amount > 0) {
+                items.push([name, amount]);
+            }
+        });
+        return items;
+    }
+
+    addQuickItemButton.addEventListener('click', () => addQuickItemRow());
 
     // Load saved form data
     const savedForm = loadFormFromLocalStorage();
@@ -403,6 +447,9 @@ function initSetupPage(): void {
         logoUrlInput.value = savedForm.logoUrl;
         showGearCheckbox.checked = savedForm.showGear;
         showDescriptionCheckbox.checked = savedForm.showDescription;
+        for (const [name, amount] of savedForm.quickItems) {
+            addQuickItemRow(name, amount);
+        }
     }
 
     // Update WASM status
@@ -491,10 +538,11 @@ function initSetupPage(): void {
             }
 
             // Save form data
-            saveFormToLocalStorage(descriptorReEncoded, currency, showGear, showDescription, logoUrl);
+            const quickItems = getQuickItems();
+            saveFormToLocalStorage(descriptorReEncoded, currency, showGear, showDescription, logoUrl, quickItems);
 
             // Generate the link
-            const encoded = encodeConfig(descriptorReEncoded, currency, showGear, showDescription, logoUrl);
+            const encoded = encodeConfig(descriptorReEncoded, currency, showGear, showDescription, logoUrl, quickItems);
             const baseUrl = window.location.origin + window.location.pathname;
             const posLink = `${baseUrl}#${encoded}`;
 
@@ -875,6 +923,26 @@ function initPosPage(config: POSConfig): void {
     document.getElementById('backspace')!.addEventListener('click', handleBackspace);
     document.getElementById('clear')!.addEventListener('click', handleClear);
     submitButton.addEventListener('click', handleSubmit);
+
+    // Quick item buttons
+    if (config.q && config.q.length > 0) {
+        const quickItemsContainer = document.getElementById('quick-items') as HTMLDivElement;
+        for (const [name, amount] of config.q) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'quick-item-button';
+            btn.textContent = `${name} – ${amount}`;
+            btn.addEventListener('click', () => {
+                inputMode = 'fiat';
+                updateDisplayStyles();
+                currentAmount = String(amount);
+                formatDisplay();
+                descriptionInput.value = name;
+                handleSubmit();
+            });
+            quickItemsContainer.appendChild(btn);
+        }
+    }
 
     // Keyboard input
     document.addEventListener('keydown', (e: KeyboardEvent) => {

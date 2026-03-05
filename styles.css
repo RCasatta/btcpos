@@ -1054,6 +1054,102 @@ body {
     }
 }
 
+/* Quick Items — Setup Page Editor */
+.quick-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quick-item-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.quick-item-name {
+    flex: 2;
+    padding: 10px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.quick-item-amount {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.quick-item-name:focus,
+.quick-item-amount:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(247, 147, 26, 0.15);
+}
+
+.quick-item-remove {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    line-height: 1;
+}
+
+.quick-item-remove:hover {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.add-quick-item-button {
+    align-self: flex-start;
+    padding: 8px 16px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.add-quick-item-button:hover {
+    border-color: #f7931a;
+}
+
+/* Quick Items — POS Page Buttons */
+.quick-items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.quick-item-button {
+    padding: 16px 8px;
+    border: 2px solid #f7931a;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    text-align: center;
+    word-break: break-word;
+}
+
+.quick-item-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(247, 147, 26, 0.3);
+}
+
+.quick-item-button:active {
+    transform: translateY(0);
+}
+
 /* Desktop responsive */
 @media (min-width: 1024px) {
     .container {
