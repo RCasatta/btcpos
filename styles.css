@@ -500,11 +500,12 @@ body {
     padding: 14px;
     border: 2px solid #e9ecef;
     border-radius: 12px;
-    font-size: 13px;
+    font-size: 14px;
     font-family: 'Courier New', monospace;
     resize: vertical;
     min-height: 100px;
     transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
 }
 
 .descriptor-input:focus {
@@ -537,9 +538,10 @@ body {
     padding: 14px;
     border: 2px solid #e9ecef;
     border-radius: 12px;
-    font-size: 15px;
+    font-size: 16px;
     font-family: inherit;
     transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
 }
 
 .url-input:focus {
@@ -586,11 +588,12 @@ body {
 
 .link-input {
     flex: 1;
-    padding: 12px;
+    padding: 14px;
     border: 2px solid #e9ecef;
-    border-radius: 10px;
-    font-size: 13px;
+    border-radius: 12px;
+    font-size: 14px;
     font-family: 'Courier New', monospace;
+    box-sizing: border-box;
 }
 
 .copy-button {
@@ -1069,18 +1072,20 @@ body {
 
 .quick-item-name {
     flex: 2;
-    padding: 10px 12px;
+    padding: 14px;
     border: 2px solid #e9ecef;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
 }
 
 .quick-item-amount {
     flex: 1;
-    padding: 10px 12px;
+    padding: 14px;
     border: 2px solid #e9ecef;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: inherit;
 }
 
 .quick-item-name:focus,
